@@ -1,0 +1,251 @@
+---
+title: "The Connect Four Tournament"
+author: "Kevin Cao"
+date: \today
+header-includes:
+   - \usepackage{graphicx}
+   - \usepackage{bm}
+output: pdf_document
+---
+
+```{r}
+initialize_board <- function() {
+  matrix(0, nrow = 6, ncol = 7)
+}
+display_board <- function(board) {
+print(board)
+}
+board <- initialize_board()
+display_board(board)
+```
+
+
+# Helper Functions
+
+Here are some helper functions that you may use in your program. Do NOT modify them. 
+
+```{r}
+# DO NOT MODIFY ANYTHING IN THIS CODE CHUNK
+# Initialize the board
+# the board is a 6x7 matrix containing only integers 0, 1, or 2
+#   0 means a field is not taken
+#   1 means this is player 1s piece
+#   2 means this is player 2s piece
+# the board starts out empty (all 0s)
+initialize_board <- function() {
+  matrix(0, nrow = 6, ncol = 7)
+}
+
+# Display the board in the console
+# Argument:
+#   board: a 6x7 matrix containing integers 0, 1, 2
+# Return:
+#  The same board
+display_board <- function(board) {
+  # feel free to add a nice plot here
+  # this is totally optional and you will receive no credit for it
+  print(board)
+}
+
+# Drop a piece into a column
+# this is a function with arguments:
+#   board: a 6x7 matrix containing integers 0, 1, 2
+#   column: an integer between 1 and 7, the column that a piece is dropped into
+#   player: integer 1 or 2, the player that dropped the piece
+# this function returns the board with correct piece (1 or 2) dropped down into
+# the correct column all the way down to the correct row.
+# Notice that the columns fills up from row 6, then row 5, ..., and are full when 
+# row 1 contains a piece.
+# Return: the updated board
+drop_piece <- function(board, column, player) {
+  if (!(column %in% 1:7)) stop("column needs to be between 1 and 7.")
+  # start checking in row 6, then row 5, ..., until row 1
+  for (row in nrow(board):1) {
+    # if this slot is still available
+    if (board[row, column] == 0) {
+      # fill it with the appropriate piece (1 or 2)
+      board[row, column] <- player
+      # output the updated board
+      return(board)
+    }
+  }
+  # throw an error message if the column is full already
+  stop("Column is full!")
+}
+```
+
+
+# 1. Writing your AI
+
+Write your actual AI in a separate .R file called "ai_123456789.R" where you replace 123456789 with your student ID number.
+
+```{r}
+# source your ai_406468424.R file to have your AI available
+# make sure you create a ai_123456789.R file
+# This file should only contain one function called ai_123456789(), where 
+# 123456789 is replaced with your UID number.
+# Make sure your AI code is available for the rest of this document
+source("ai_406468424.R") # replace with your own UID number
+# make sure your AI code is included in your pdf output
+cat(readLines("ai_406468424.R"), sep = "\n") # replace with your own UID number
+```
+
+
+## Testing your AI
+
+Now that you have an AI you should test it by playing against it yourself. Do not include the `play_connect_four()` or any gameplay in your .Rmd file. I provide this function as a service to you; by playing your AI you can find its weaknesses and refine your approach. To play connect four against your AI, you will call the main function `play_connect_four()`, that has as its only argument whether the human or the AI should go first. Then it will take turns asking for input ("Which column do you want to drop your piece into?") from the human and the AI until either one of them wins or the board is full.
+
+```{r}
+# DO NOT MODIFY THIS CHUNK - ONLY REPLACE 123456789 with your UID number
+# Main game loop
+# This function simulates a Connect Four game where a human player competes against an AI.
+# Arguments:
+#   player_1_human: Logical (TRUE/FALSE). If TRUE, the human player is Player 1.
+#                   Otherwise, the AI is Player 1.
+# Returns:
+#   A list containing the winner of the game ("Human", "AI", or "Draw!") and the
+#   total number of turns played.
+play_connect_four <- function(player_1_human = TRUE) {
+  board <- initialize_board() # Initialize the empty game board
+  player_1_turn <- TRUE # Track whose turn it is (Player 1 starts)
+  winner <- "undecided" # Track the game status
+  n_turns <- 0 # Count the number of turns
+  
+  # play until someone wins or the board is filled up resulting in a draw
+  while (winner == "undecided") {
+    display_board(board) # Display the current board state
+    n_turns <- n_turns + 1 # Increment the turn counter
+    
+    # Determine the current player
+    if ((player_1_human & n_turns %% 2 == 1) |
+        (!player_1_human & n_turns %% 2 == 0)) {
+      current_player <- "Human"
+    } else {
+      current_player <- "AI"
+    }
+    # and what piece they are using
+    if (player_1_turn) {
+      piece <- 1
+    } else {
+      piece <- 2
+    }
+    if (current_player == "Human") {
+      # human's turn
+      cat("Your turn player ", piece, " ! Choose a column (1-7): ")
+      column <- -1
+      # make sure the human player selects a valid column
+      while (column < 1 || column > 7 || board[1, column] != 0) {
+        column <- as.integer(readline())
+        if (column < 1 || column > 7 || board[1, column] != 0) {
+          cat("Invalid column. Try again.\n")
+        }
+      }
+      board <- drop_piece(board = board, column = column, player = piece)
+      if (check_winner(board = board, player = piece)) {
+        display_board(board)
+        cat("Congratulations! You win!\n")
+        winner <- "Human"
+      }
+    } else {
+      # AI's turn
+      cat("AI (Player ", piece,") is thinking...\n")
+      Sys.sleep(1)
+      column <- ai_minimax(board) # YOUR UID NUMBER GOES HERE
+      # LATER ai_minimax() WILL GO THERE
+      board <- drop_piece(board = board, column = column, player = piece)
+      if (check_winner(board = board, player = piece)) {
+        display_board(board)
+        cat("AI (Player ", piece,") wins! Better luck next time.\n")
+        winner <- "AI"
+      }
+    }
+    
+    # Check for draw
+    if (!any(board == 0)) {
+      display_board(board)
+      cat("It's a draw!\n")
+      winner <- "Draw!"
+    }
+    
+    # Alternate turns
+    player_1_turn <- !player_1_turn
+  }
+  
+  # Return the game results
+  list(winner = winner,
+       n_turns = n_turns)
+}
+```
+
+Make sure that your AI handles itself well as player 1 and player 2 by playing against it.
+
+```{r,eval=FALSE}
+# test your AI as player 1 and player 2
+play_connect_four(player_1_human = TRUE) # do not include this when knitting
+play_connect_four(player_1_human = FALSE) # do not include this when knitting
+```
+
+
+
+# 2. Writing the best possible AI - using AI
+
+
+```{r}
+ai_minimax <- function(board) {
+  # Helper functions
+  get_valid_cols <- function(b) which(b[1, ] == 0)
+  get_next_row <- function(b, col) max(which(b[, col] == 0))
+  drop_piece <- function(b, row, col, p) { b[row, col] <- p; b }
+  
+  # Minimax algorithm with Alpha-Beta pruning
+  minimax <- function(b, depth, alpha, beta, is_max, p, opp) {
+    valid_cols <- get_valid_cols(b)
+    if (check_winner(board = b, player = p)) return(list(score = 1000, col = NULL))
+    if (check_winner(board = b, player = opp)) return(list(score = -1000, col = NULL))
+    if (depth == 0 || length(valid_cols) == 0) return(list(score = 0, col = NULL))
+    
+    if (is_max) {
+      best <- list(score = -Inf, col = NULL)
+      for (col in valid_cols) {
+        row <- get_next_row(b, col)
+        b_new <- drop_piece(b, row, col, p)
+        score <- minimax(b_new, depth - 1, alpha, beta, FALSE, p, opp)$score
+        if (score > best$score) {
+          best$score <- score
+          best$col <- col
+        }
+        alpha <- max(alpha, best$score)
+        if (alpha >= beta) break
+      }
+      return(best)
+    } else {
+      best <- list(score = Inf, col = NULL)
+      for (col in valid_cols) {
+        row <- get_next_row(b, col)
+        b_new <- drop_piece(b, row, col, opp)
+        score <- minimax(b_new, depth - 1, alpha, beta, TRUE, p, opp)$score
+        if (score < best$score) {
+          best$score <- score
+          best$col <- col
+        }
+        beta <- min(beta, best$score)
+        if (alpha >= beta) break
+      }
+      return(best)
+    }
+  }
+  
+  # Define player pieces (AI is 2, human is 1)
+  ai_piece <- 2
+  human_piece <- 1
+  
+  # Run minimax with depth 5 (adjustable)
+  result <- minimax(board, depth = 5, alpha = -Inf, beta = Inf, is_max = TRUE, p = ai_piece, opp = human_piece)
+  return(result$col)
+}
+```
+
+
+
+
+
