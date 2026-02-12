@@ -13,8 +13,9 @@ rmarkdown
 
 How to Run
 In R Studio: 
-install.packages("rmarkdown")
-rmarkdown::render("connect_4_R_Script.Rmd")
+- install.packages("rmarkdown")
+
+- rmarkdown::render("connect_4_R_Script.Rmd")
 
 
 
