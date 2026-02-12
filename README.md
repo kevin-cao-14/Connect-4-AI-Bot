@@ -7,6 +7,14 @@ Key Components:
 - Minimax decision search with alpha-beta pruning optimization
 - Turn-based simulation for agent vs. human gameplay
 
+Requirements:
+R
+rmarkdown
 
 How to Run
-rmarkdown::render("connect4.Rmd")
+In R Studio: 
+install.packages("rmarkdown")
+rmarkdown::render("connect_4_R_Script.Rmd")
+
+
+
