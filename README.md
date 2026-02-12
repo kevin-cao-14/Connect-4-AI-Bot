@@ -1,4 +1,4 @@
-#Overview
+Overview:
 This project implements an adversarial game-playing agent for Connect 4 using a depth-limited minimax search with alpha-beta pruning. The agent evaluates board states and selects moves that maximize win probability while preventing opponent threats.
 
 Key Components:
