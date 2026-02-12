@@ -2,9 +2,7 @@
 title: "The Connect Four Tournament"
 author: "Kevin Cao"
 date: \today
-header-includes:
-   - \usepackage{graphicx}
-   - \usepackage{bm}
+
 output: html_document
 ---
 
