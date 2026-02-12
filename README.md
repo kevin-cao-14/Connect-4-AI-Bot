@@ -18,4 +18,5 @@ In R Studio:
 - rmarkdown::render("connect_4_R_Script.Rmd")
 
 
-
+##Sample Screenshot:
+![Board Example](Example_Board.png)
